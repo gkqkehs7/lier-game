@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: '나는 누구? — 라이어 게임',
@@ -28,9 +29,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
-        <main className="mx-auto max-w-[430px] min-h-dvh flex flex-col">
-          {children}
-        </main>
+        <Providers>
+          <main className="mx-auto max-w-[430px] min-h-dvh flex flex-col">
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   )
