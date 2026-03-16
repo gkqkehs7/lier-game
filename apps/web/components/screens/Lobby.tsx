@@ -15,7 +15,7 @@ export function Lobby() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const { emit, on } = useSocket()
+  const { emit, on, connected } = useSocket()
   const { dispatch } = useGame()
   const router = useRouter()
 
@@ -47,6 +47,16 @@ export function Lobby() {
       offError()
     }
   }, [on, router])
+
+  // 10초 타임아웃
+  useEffect(() => {
+    if (!loading) return
+    const t = setTimeout(() => {
+      setLoading(false)
+      setError('서버 응답이 없습니다. 잠시 후 다시 시도해 주세요.')
+    }, 10000)
+    return () => clearTimeout(t)
+  }, [loading])
 
   function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -144,7 +154,9 @@ export function Lobby() {
           disabled={loading}
           className={loading ? 'opacity-60 cursor-not-allowed' : ''}
         >
-          {loading ? '연결 중...' : tab === 'create' ? '방 만들기 🎮' : '입장하기 🚪'}
+          {loading
+            ? (connected ? '방 만드는 중...' : '서버 연결 중...')
+            : tab === 'create' ? '방 만들기 🎮' : '입장하기 🚪'}
         </BubbleButton>
       </form>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { ClientToServerEvents, ServerToClientEvents } from 'shared'
 
@@ -17,6 +17,7 @@ function getSocket(): GameSocket {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      transports: ['websocket', 'polling'],
     })
   }
   return socket
@@ -24,14 +25,26 @@ function getSocket(): GameSocket {
 
 export function useSocket() {
   const socketRef = useRef<GameSocket>(getSocket())
+  const [connected, setConnected] = useState(socketRef.current.connected)
 
   useEffect(() => {
     const sock = socketRef.current
+
+    const onConnect = () => setConnected(true)
+    const onDisconnect = () => setConnected(false)
+
+    sock.on('connect', onConnect)
+    sock.on('disconnect', onDisconnect)
+
     if (!sock.connected) {
       sock.connect()
+    } else {
+      setConnected(true)
     }
+
     return () => {
-      // 컴포넌트 언마운트 시에도 연결 유지 (싱글톤)
+      sock.off('connect', onConnect)
+      sock.off('disconnect', onDisconnect)
     }
   }, [])
 
@@ -40,7 +53,14 @@ export function useSocket() {
       event: E,
       ...args: Parameters<ClientToServerEvents[E]>
     ) => {
-      socketRef.current.emit(event, ...args)
+      const sock = socketRef.current
+      if (sock.connected) {
+        sock.emit(event, ...args)
+      } else {
+        // 연결되면 즉시 emit
+        sock.once('connect', () => sock.emit(event, ...args))
+        sock.connect()
+      }
     },
     []
   )
@@ -62,6 +82,7 @@ export function useSocket() {
 
   return {
     socket: socketRef.current,
+    connected,
     emit,
     on,
   }
