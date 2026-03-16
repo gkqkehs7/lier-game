@@ -162,8 +162,10 @@ export class GameManager {
 
     this.io.to(roomId).emit('vote-updated', { votes: room.game.votes })
 
-    // 전원 투표 완료 시 즉시 집계
-    if (Object.keys(room.game.votes).length >= room.players.length) {
+    // 저장 후 최신 상태 재조회 → race condition 방지
+    const latest = await this.roomManager.getRoom(roomId)
+    if (!latest?.game || latest.game.phase !== 'vote') return
+    if (Object.keys(latest.game.votes).length >= latest.players.length) {
       this.timerManager.clear(roomId)
       await this.resolveVote(roomId)
     }
@@ -172,6 +174,7 @@ export class GameManager {
   private async resolveVote(roomId: string): Promise<void> {
     const room = await this.roomManager.getRoom(roomId)
     if (!room?.game) return
+    if (room.game.phase !== 'vote') return  // 중복 실행 방지
 
     const voteCounts: Record<string, number> = {}
     for (const targetId of Object.values(room.game.votes)) {
@@ -240,7 +243,10 @@ export class GameManager {
 
     this.io.to(roomId).emit('final-vote-updated', { finalVotes: room.game.finalVotes })
 
-    if (Object.keys(room.game.finalVotes).length >= room.players.length) {
+    // 저장 후 최신 상태 재조회 → race condition 방지
+    const latest = await this.roomManager.getRoom(roomId)
+    if (!latest?.game || latest.game.phase !== 'finalVote') return
+    if (Object.keys(latest.game.finalVotes).length >= latest.players.length) {
       this.timerManager.clear(roomId)
       await this.resolveFinalVote(roomId)
     }
