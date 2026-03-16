@@ -117,15 +117,16 @@ export function Lobby() {
       >
         <div className="bubble-card p-5 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-bold text-ui-text">닉네임</span>
+            <span className="text-sm font-bold text-ui-text">이름 (본명)</span>
             <input
               type="text"
               value={nickname}
               onChange={(e) => { setNickname(e.target.value); setError(null) }}
-              placeholder="게임에서 사용할 이름"
+              placeholder="실제 이름을 입력해 주세요"
               maxLength={8}
               className="w-full rounded-2xl border-2 border-ui-bg bg-ui-bg px-4 py-3 text-ui-text placeholder-ui-text/40 focus:outline-none focus:border-ui-text transition-colors"
             />
+            <span className="text-xs text-ui-text/40">제시어가 참여자 본명이에요 — 별명 말고 실명으로!</span>
           </label>
 
           {tab === 'join' && (
