@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ui-bg text-ui-text font-sans;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .bubble-card {
+    @apply rounded-4xl bg-white shadow-lg;
+  }
+
+  .btn-bubble {
+    @apply rounded-full font-bold transition-all active:scale-95 cursor-pointer;
+  }
+}

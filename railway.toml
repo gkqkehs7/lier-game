@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npx turbo build --filter=server..."
+
+[deploy]
+startCommand = "node apps/server/dist/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
