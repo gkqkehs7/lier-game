@@ -11,10 +11,11 @@ function generateRoomId(): string {
 }
 
 export class RoomManager {
-  async createRoom(hostId: string, nickname: string): Promise<Room> {
+  async createRoom(hostId: string, nickname: string, roomName: string): Promise<Room> {
     const roomId = generateRoomId()
     const room: Room = {
       roomId,
+      roomName: roomName || '우리들의 방',
       hostId,
       players: [{ id: hostId, nickname, isReady: true }],
       status: 'waiting',

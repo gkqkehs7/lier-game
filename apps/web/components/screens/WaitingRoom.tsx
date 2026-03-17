@@ -12,7 +12,7 @@ export function WaitingRoom() {
   const { emit } = useSocket()
   const [copied, setCopied] = useState(false)
 
-  const { roomId, players, playerId, isHost } = state
+  const { roomId, roomName, players, playerId, isHost } = state
   const playerCount = players.length
   const canStart = isHost && playerCount >= GAME_CONSTANTS.MIN_PLAYERS
   const shareUrl = typeof window !== 'undefined'
@@ -36,8 +36,11 @@ export function WaitingRoom() {
     <div className="flex flex-col flex-1 px-6 py-8 gap-6">
       {/* 헤더 */}
       <div className="text-center">
+        {roomName && (
+          <h2 className="text-2xl font-black text-ui-text mb-1">{roomName}</h2>
+        )}
         <p className="text-ui-text/50 text-sm mb-1">방 코드</p>
-        <h2 className="text-4xl font-black text-ui-text tracking-widest font-mono">{roomId}</h2>
+        <p className="text-3xl font-black text-ui-text tracking-widest font-mono">{roomId}</p>
       </div>
 
       {/* 링크 공유 */}

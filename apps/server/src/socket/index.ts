@@ -19,15 +19,16 @@ export function registerSocketHandlers(io: IO): void {
     console.log(`[Socket] Connected: ${socket.id}`)
 
     // ===== 방 생성 =====
-    socket.on('create-room', async ({ nickname }) => {
+    socket.on('create-room', async ({ nickname, roomName }) => {
       try {
-        const room = await roomManager.createRoom(socket.id, nickname)
+        const room = await roomManager.createRoom(socket.id, nickname, roomName)
         socket.join(room.roomId)
         socketRoomMap.set(socket.id, room.roomId)
         socket.emit('room-created', { roomId: room.roomId, playerId: socket.id })
         io.to(room.roomId).emit('room-updated', {
           players: room.players,
           status: room.status,
+          roomName: room.roomName,
         })
         console.log(`[Room] Created: ${room.roomId} by ${nickname}`)
       } catch (err) {
@@ -66,6 +67,7 @@ export function registerSocketHandlers(io: IO): void {
         io.to(roomId).emit('room-updated', {
           players: updatedRoom.players,
           status: updatedRoom.status,
+          roomName: updatedRoom.roomName,
         })
         console.log(`[Room] ${nickname} joined ${roomId}`)
       } catch (err) {
@@ -140,6 +142,7 @@ export function registerSocketHandlers(io: IO): void {
         io.to(roomId).emit('room-updated', {
           players: updatedRoom.players,
           status: updatedRoom.status,
+          roomName: updatedRoom.roomName,
         })
       }
 

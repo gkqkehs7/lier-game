@@ -20,6 +20,7 @@ export type AppScreen =
 export interface GameState {
   screen: AppScreen
   roomId: string | null
+  roomName: string | null
   playerId: string | null
   nickname: string | null
   pendingNickname: string | null  // emit 후 서버 응답 전까지 임시 보관
@@ -42,6 +43,7 @@ export interface GameState {
 const initialState: GameState = {
   screen: 'lobby',
   roomId: null,
+  roomName: null,
   playerId: null,
   nickname: null,
   pendingNickname: null,
@@ -66,7 +68,7 @@ type Action =
   | { type: 'SET_PENDING'; nickname: string; roomId?: string }
   | { type: 'ROOM_CREATED'; roomId: string; playerId: string }
   | { type: 'ROOM_JOINED'; playerId: string }
-  | { type: 'ROOM_UPDATED'; players: Player[] }
+  | { type: 'ROOM_UPDATED'; players: Player[]; roomName: string }
   | { type: 'GAME_STARTED'; role: Role; keyword?: string; turnOrder: string[] }
   | { type: 'TURN_CHANGED'; currentPlayerId: string; timeLeft: number }
   | { type: 'HINT_SUBMITTED'; playerId: string; text: string | null }
@@ -115,7 +117,7 @@ function reducer(state: GameState, action: Action): GameState {
         error: null,
       }
     case 'ROOM_UPDATED':
-      return { ...state, players: action.players }
+      return { ...state, players: action.players, roomName: action.roomName }
     case 'GAME_STARTED':
       return {
         ...state,
@@ -208,8 +210,8 @@ export function GameProvider({ children, initialRoomId }: { children: ReactNode;
       on('room-joined', ({ playerId }) => {
         dispatch({ type: 'ROOM_JOINED', playerId })
       }),
-      on('room-updated', ({ players }) => {
-        dispatch({ type: 'ROOM_UPDATED', players })
+      on('room-updated', ({ players, roomName }) => {
+        dispatch({ type: 'ROOM_UPDATED', players, roomName })
       }),
       on('game-started', ({ role, keyword, turnOrder }) => {
         dispatch({ type: 'GAME_STARTED', role, keyword, turnOrder })

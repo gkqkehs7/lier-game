@@ -50,6 +50,7 @@ export type RoomStatus = 'waiting' | 'playing' | 'finished'
 
 export interface Room {
   roomId: string
+  roomName: string
   hostId: string
   players: Player[]
   status: RoomStatus
@@ -64,7 +65,7 @@ export type Winner = 'liar' | 'citizen'
 
 // ===== 클라이언트 → 서버 이벤트 =====
 export interface ClientToServerEvents {
-  'create-room': (data: { nickname: string }) => void
+  'create-room': (data: { nickname: string; roomName: string }) => void
   'join-room': (data: { roomId: string; nickname: string }) => void
   'start-game': (data: { roomId: string }) => void
   'submit-hint': (data: { roomId: string; text: string }) => void
@@ -79,7 +80,7 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
   'room-created': (data: { roomId: string; playerId: string }) => void
   'room-joined': (data: { playerId: string }) => void
-  'room-updated': (data: { players: Player[]; status: RoomStatus }) => void
+  'room-updated': (data: { players: Player[]; status: RoomStatus; roomName: string }) => void
   'game-started': (data: { role: Role; keyword?: string; turnOrder: string[] }) => void
   'turn-changed': (data: { currentPlayerId: string; timeLeft: number }) => void
   'hint-submitted': (data: { playerId: string; text: string | null }) => void
